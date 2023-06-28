@@ -1,0 +1,42 @@
+const Web3 = require('web3');
+const Tx = require('ethereumjs-tx').Transaction;
+
+// Подключение к сети Ethereum
+const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'));
+
+// Приватный ключ и адрес кошелька
+const privateKey = Buffer.from('YOUR_PRIVATE_KEY', 'hex');
+const walletAddress = 'YOUR_WALLET_ADDRESS';
+
+// Адрес контракта Uniswap
+const uniswapContractAddress = 'UNISWAP_CONTRACT_ADDRESS';
+
+// Функция для отправки транзакции на Uniswap
+async function sendTransaction() {
+  try {
+    // Получение текущего номера блока
+    const blockNumber = await web3.eth.getBlockNumber();
+
+    // Создание экземпляра контракта Uniswap
+    const uniswapContract = new web3.eth.Contract(UNISWAP_CONTRACT_ABI, uniswapContractAddress);
+
+    // Создание транзакции для обмена токенов на Uniswap
+    const txData = uniswapContract.methods.swapTokensForExactTokens(
+      desiredAmountOut,  // Желаемая сумма выходного токена
+      amountInMax,       // Максимальная сумма входного токена
+      path,              // Маршрут обмена токенов
+      to,                // Адрес получателя
+      deadline           // Срок действия транзакции
+    ).encodeABI();
+
+    const txCount = await web3.eth.getTransactionCount(walletAddress);
+
+    const txObject = {
+      nonce: web3.utils.toHex(txCount),
+      gasLimit: web3.utils.toHex(300000), // Лимит газа для транзакции
+      gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')), // Цена газа
+      to: uniswapContractAddress,
+      data: txData
+    };
+
+    // Создание экземпляра транзакции и подписание ее прив
