@@ -1,0 +1,39 @@
+import os
+import zipfile
+import PyPDF2
+
+def archive_pdf_files(directory_path, archive_name):
+    # Create a ZIP file
+    zip_file = zipfile.ZipFile(archive_name, 'w', zipfile.ZIP_DEFLATED)
+
+    # Iterate through all files in the directory
+    for root, _, files in os.walk(directory_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path.endswith('.pdf'):
+                # Open the PDF file
+                pdf_file = open(file_path, 'rb')
+
+                # Read the PDF file using PyPDF2
+                pdf_reader = PyPDF2.PdfReader(pdf_file)
+
+                # Check if the PDF file is valid
+                if pdf_reader.isEncrypted:
+                    print(f"Skipping encrypted PDF: {file_path}")
+                    continue
+
+                # Add the PDF file to the ZIP file
+                zip_file.write(file_path, os.path.relpath(file_path, directory_path))
+
+                # Close the PDF file
+                pdf_file.close()
+
+    # Close the ZIP file
+    zip_file.close()
+
+# Specify the directory path and archive name
+directory_path = '/path/to/directory'  # Replace with your directory path
+archive_name = 'pdf_archive.zip'  # Replace with your archive name
+
+# Call the function to archive PDF files
+archive_pdf_files(directory_path, archive_name)
